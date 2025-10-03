@@ -19,22 +19,7 @@ func Push(args []string) {
 	var execCmd *exec.Cmd
 	var err error
 	if isDirty {
-		execCmd = exec.Command("git", "add", ".")
-
-		execCmd.Dir = gitRepoPath
-
-		err = execCmd.Run()
-		if err != nil {
-			log.Fatalf("Error adding changes: %v", err)
-		}
-
-		execCmd = exec.Command("git", "commit", "-m", "Auto-commit before push")
-		execCmd.Dir = gitRepoPath
-
-		err = execCmd.Run()
-		if err != nil {
-			log.Fatalf("Error committing changes: %v", err)
-		}
+		addAndCommit(gitRepoPath, "auto-commit before push")
 	}
 
 	branch, err := getCurrentBranch()
@@ -53,6 +38,25 @@ func Push(args []string) {
 	err = execCmd.Run()
 	if err != nil {
 		log.Fatalf("Error pushing changes: %v", err)
+	}
+}
+
+func addAndCommit(path, message string) {
+	execCmd := exec.Command("git", "add", ".")
+
+	execCmd.Dir = path
+
+	err := execCmd.Run()
+	if err != nil {
+		log.Fatalf("Error adding changes: %v", err)
+	}
+
+	execCmd = exec.Command("git", "commit", "-m", message)
+	execCmd.Dir = path
+
+	err = execCmd.Run()
+	if err != nil {
+		log.Fatalf("Error committing changes: %v", err)
 	}
 }
 

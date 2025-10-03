@@ -36,6 +36,16 @@ var addSubCommand = &cobra.Command{
 	},
 }
 
+var removeSubCommand = &cobra.Command{
+	Use:   "remove",
+	Short: "Remove a dot file from dotman repository",
+	Long:  `Remove a dot file from dotman repository`,
+	Run: func(cmd *cobra.Command, args []string) {
+		// Implementation of the remove command
+		Remove(args)
+	},
+}
+
 var pushSubCommand = &cobra.Command{
 	Use:   "push",
 	Short: "Push changes to remote repository",
@@ -47,6 +57,6 @@ var pushSubCommand = &cobra.Command{
 }
 
 func Execute() {
-	rootCmd.AddCommand(initSubCommand, addSubCommand, pushSubCommand)
+	rootCmd.AddCommand(initSubCommand, addSubCommand, pushSubCommand, removeSubCommand)
 	cobra.CheckErr(rootCmd.Execute())
 }
