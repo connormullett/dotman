@@ -60,6 +60,15 @@ var syncSubCommand = &cobra.Command{
 	},
 }
 
+var listSubCommand = &cobra.Command{
+	Use:   "list",
+	Short: "List all managed dot files",
+	Long:  `List all managed dot files`,
+	Run: func(cmd *cobra.Command, args []string) {
+		subcommands.List(args)
+	},
+}
+
 func Execute() {
 	rootCmd.AddCommand(
 		initSubCommand,
@@ -67,6 +76,7 @@ func Execute() {
 		pushSubCommand,
 		removeSubCommand,
 		syncSubCommand,
+		listSubCommand,
 	)
 	pushSubCommand.Flags().BoolP("force", "f", false, "Force push changes to remote repository")
 	cobra.CheckErr(rootCmd.Execute())
