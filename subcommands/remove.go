@@ -1,4 +1,4 @@
-package cmd
+package subcommands
 
 import (
 	"log"
@@ -8,7 +8,7 @@ import (
 )
 
 func Remove(args []string) {
-	settings := readConfig()
+	settings := ReadConfig()
 
 	dotfileName := args[0]
 
@@ -38,5 +38,5 @@ func Remove(args []string) {
 		log.Fatalf("Error moving file back to original location: %v", err)
 	}
 
-	addAndCommit(path, "Removed "+dotfileName)
+	AddAndCommit(path, "Removed "+dotfileName)
 }

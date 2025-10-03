@@ -1,4 +1,4 @@
-package cmd
+package subcommands
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 )
 
 func Add(args []string) {
-	settings := readConfig()
+	settings := ReadConfig()
 
 	dotfilePath := args[0]
 
@@ -64,32 +64,8 @@ func Add(args []string) {
 	}
 
 	// git add
-	executeGitAdd(repoPath, targetPath)
+	GitAdd(repoPath, targetPath)
 
 	// create commit
-	executeCommitNewFile(repoPath, fileName)
-}
-
-func executeGitAdd(path, file string) {
-	commandName := "git"
-	cmdArgs := []string{"add", file}
-
-	cmd := createCommand(commandName, cmdArgs, path)
-
-	err := cmd.Run()
-	if err != nil {
-		log.Fatalf("Command execution failed in %s: %v\n", path, err)
-	}
-}
-
-func executeCommitNewFile(path, fileName string) {
-	commandName := "git"
-	cmdArgs := []string{"commit", "-m", fmt.Sprintf("Add %s", fileName)}
-
-	cmd := createCommand(commandName, cmdArgs, path)
-
-	err := cmd.Run()
-	if err != nil {
-		log.Fatalf("Command execution failed in %s: %v\n", path, err)
-	}
+	CommitNewFile(repoPath, fileName)
 }

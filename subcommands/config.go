@@ -1,4 +1,4 @@
-package cmd
+package subcommands
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ type Settings struct {
 	Path string `json:"path"`
 }
 
-func readConfig() Settings {
+func ReadConfig() Settings {
 	configPath := configdir.LocalConfig("dotman")
 	err := configdir.MakePath(configPath)
 	if err != nil {

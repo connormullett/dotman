@@ -1,20 +1,17 @@
 package cmd
 
 import (
+	"github.com/dotman/subcommands"
 	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "dotman",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Short: "Manage dot files with git behind the scenes",
+	Long: `Simple CLI tool to manage your dot files using git as the backend.
+It allows you to easily add, remove, push, and sync your dot files with a
+remote repository to serve as the single source of truth.`,
 }
 
 var initSubCommand = &cobra.Command{
@@ -22,7 +19,7 @@ var initSubCommand = &cobra.Command{
 	Short: "Initialize dotman repository",
 	Long:  `Initialize dotman repository`,
 	Run: func(cmd *cobra.Command, args []string) {
-		Init(args)
+		subcommands.Init(args)
 	},
 }
 
@@ -31,8 +28,7 @@ var addSubCommand = &cobra.Command{
 	Short: "Add a new dot file to dotman repository",
 	Long:  `Add a new dot file to dotman repository`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Implementation of the add command
-		Add(args)
+		subcommands.Add(args)
 	},
 }
 
@@ -41,8 +37,7 @@ var removeSubCommand = &cobra.Command{
 	Short: "Remove a dot file from dotman repository",
 	Long:  `Remove a dot file from dotman repository`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Implementation of the remove command
-		Remove(args)
+		subcommands.Remove(args)
 	},
 }
 
@@ -51,12 +46,28 @@ var pushSubCommand = &cobra.Command{
 	Short: "Push changes to remote repository",
 	Long:  `Push changes to remote repository`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Implementation of the push command
-		Push(args)
+		force, _ := cmd.Flags().GetBool("force")
+		subcommands.Push(args, force)
+	},
+}
+
+var syncSubCommand = &cobra.Command{
+	Use:   "sync",
+	Short: "Sync dotman repository with remote. It's a good idea to execute \nthis in your shell's startup file to ensure your dotfiles are always up to date.",
+	Long:  `Sync dotman repository with remote. It's a good idea to execute \nthis in your shell's startup file to ensure your dotfiles are always up to date.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		subcommands.Sync(args)
 	},
 }
 
 func Execute() {
-	rootCmd.AddCommand(initSubCommand, addSubCommand, pushSubCommand, removeSubCommand)
+	rootCmd.AddCommand(
+		initSubCommand,
+		addSubCommand,
+		pushSubCommand,
+		removeSubCommand,
+		syncSubCommand,
+	)
+	pushSubCommand.Flags().BoolP("force", "f", false, "Force push changes to remote repository")
 	cobra.CheckErr(rootCmd.Execute())
 }
