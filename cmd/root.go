@@ -56,7 +56,8 @@ var syncSubCommand = &cobra.Command{
 	Short: "Sync dotman repository with remote. It's a good idea to execute \nthis in your shell's startup file to ensure your dotfiles are always up to date.",
 	Long:  `Sync dotman repository with remote. It's a good idea to execute \nthis in your shell's startup file to ensure your dotfiles are always up to date.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		subcommands.Sync(args)
+		quiet, _ := cmd.Flags().GetBool("quiet")
+		subcommands.Sync(args, quiet)
 	},
 }
 
@@ -89,5 +90,6 @@ func Execute() {
 		doctorSubCommand,
 	)
 	pushSubCommand.Flags().BoolP("force", "f", false, "Force push changes to remote repository")
+	syncSubCommand.Flags().BoolP("quiet", "q", false, "Suppress output messages")
 	cobra.CheckErr(rootCmd.Execute())
 }

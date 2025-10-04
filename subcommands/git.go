@@ -8,11 +8,16 @@ import (
 	"strings"
 )
 
-func GitPull(path string) {
-	execCmd := CreateCommand("git", []string{"pull"}, path)
+func GitPull(path string, quiet bool) {
+	cmd := exec.Command("git", "pull")
+	cmd.Dir = path
+	if !quiet {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	}
 
-	err := execCmd.Run()
-	if err != nil {
+	err := cmd.Run()
+	if err != nil && !quiet {
 		log.Fatalf("Error pulling changes: %v", err)
 	}
 }

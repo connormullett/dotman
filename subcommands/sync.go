@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-func Sync(args []string) {
+func Sync(args []string, quiet bool) {
 	settings := ReadConfig()
 	repoPath := settings.Path
 
@@ -14,5 +14,5 @@ func Sync(args []string) {
 		log.Fatalf("Please commit or stash your changes before syncing.")
 	}
 
-	GitPull(repoPath)
+	GitPull(repoPath, quiet)
 }
