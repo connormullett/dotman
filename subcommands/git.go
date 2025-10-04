@@ -9,14 +9,19 @@ import (
 )
 
 func GitPull(path string, quiet bool) {
-	cmd := exec.Command("git", "pull")
+	currentBranch, err := GetCurrentBranch()
+	if err != nil {
+		log.Fatalf("Error getting current branch: %v", err)
+	}
+
+	cmd := exec.Command("git", "pull", "origin", currentBranch)
 	cmd.Dir = path
 	if !quiet {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil && !quiet {
 		log.Fatalf("Error pulling changes: %v", err)
 	}
