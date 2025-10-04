@@ -8,10 +8,12 @@ import (
 	"os/user"
 	"path/filepath"
 	"syscall"
+
+	"github.com/connormullett/dotman/util"
 )
 
-func Doctor(args []string) {
-	settings := ReadConfig()
+func Doctor(args []string, fix bool) {
+	settings := util.ReadConfig()
 
 	path := settings.Path
 
@@ -40,6 +42,25 @@ func Doctor(args []string) {
 		fmt.Println("Broken symlinks found:")
 		for _, link := range brokenLinks {
 			fmt.Println(" -", link)
+		}
+	}
+
+	if !fix {
+		return
+	}
+
+	for _, link := range brokenLinks {
+		err := os.Remove(link)
+		if err != nil {
+			log.Printf("Failed to remove broken symlink %s: %v", link, err)
+			continue
+		}
+
+		actualFile := filepath.Join(path, filepath.Base(link))
+
+		err = os.Symlink(actualFile, link)
+		if err != nil {
+			log.Printf("Failed to recreate symlink %s -> %s: %v", link, actualFile, err)
 		}
 	}
 }

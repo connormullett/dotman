@@ -6,18 +6,20 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+
+	"github.com/connormullett/dotman/util"
 )
 
 func Sync(args []string, quiet bool) {
-	settings := ReadConfig()
+	settings := util.ReadConfig()
 	repoPath := settings.Path
 
-	if CheckIfGitDirty(repoPath) {
+	if util.IsRepoDirty(repoPath) {
 		fmt.Println("Repository is dirty, This can cause conflicts in your history and merge conflicts which will need to be done manually")
 		log.Fatalf("Please commit or stash your changes before syncing.")
 	}
 
-	GitPull(repoPath, quiet)
+	util.Pull(repoPath, quiet)
 
 	// check if symlinks exist and create them if they don't
 	dotfiles := GetFilesList(repoPath)
@@ -29,11 +31,40 @@ func Sync(args []string, quiet bool) {
 
 	homeDir := currentUser.HomeDir
 	for _, file := range dotfiles {
-		sourcePath := filepath.Join(repoPath, file)
-		targetPath := filepath.Join(homeDir, file)
+		targetPath := filepath.Join(homeDir, filepath.Base(file))
+
+		// check if dotfile with the same name exists in home directory
+		info, err := os.Lstat(targetPath)
+
+		// file exists
+		if err == nil {
+			isSymlink := info.Mode()&os.ModeSymlink == os.ModeSymlink
+
+			// file already exists and is not a symlink
+			if !isSymlink {
+				// if it exists, back it up before creating the symlink
+				err := os.Rename(targetPath, targetPath+".backup")
+				if err != nil {
+					log.Printf("Error backing up existing file %s: %v", targetPath, err)
+					continue
+				}
+
+				if !quiet {
+					fmt.Printf("Backed up existing file %s to %s.backup\n", targetPath, targetPath)
+				}
+			} else {
+				// symlink already exists, skip
+				if !quiet {
+					fmt.Printf("Symlink already exists for %s\n", file)
+				}
+				continue
+			}
+		}
 
 		if !CheckIfSymlinkExists(targetPath) {
-			err := os.Symlink(sourcePath, targetPath)
+			fmt.Println("source: ", file)
+			fmt.Println("target: ", targetPath)
+			err := os.Symlink(file, targetPath)
 			if err != nil {
 				log.Printf("Error creating symlink for %s: %v", file, err)
 			}

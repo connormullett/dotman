@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/connormullett/dotman/util"
 )
 
 func Init(args []string) {
@@ -15,7 +17,7 @@ func Init(args []string) {
 	remote := args[0]
 	fmt.Println("Initializing dotman repository with remote:", remote)
 
-	settings := ReadConfig()
+	settings := util.ReadConfig()
 	repoPath := settings.Path
 
 	err := os.MkdirAll(repoPath, 0755)
@@ -41,7 +43,7 @@ func Init(args []string) {
 		return
 	}
 
-	InitRepository(repoPath)
+	util.InitRepository(repoPath)
 
-	AddRemote(repoPath, remote)
+	util.AddRemote(repoPath, remote)
 }

@@ -2,12 +2,12 @@ package subcommands
 
 import (
 	"fmt"
-	"log"
-	"os"
+
+	"github.com/connormullett/dotman/util"
 )
 
 func List(args []string) {
-	settings := ReadConfig()
+	settings := util.ReadConfig()
 
 	entries := GetFilesList(settings.Path)
 	for _, entry := range entries {
@@ -16,16 +16,7 @@ func List(args []string) {
 }
 
 func GetFilesList(path string) []string {
-	entries, err := os.ReadDir(path)
-	if err != nil {
-		log.Fatalf("Failed to read directory: %v", err)
-	}
+	settings := util.ReadConfig()
 
-	var files []string
-	for _, entry := range entries {
-		if !entry.IsDir() {
-			files = append(files, entry.Name())
-		}
-	}
-	return files
+	return settings.ManagedFiles
 }

@@ -1,4 +1,4 @@
-module github.com/dotman
+module github.com/connormullett/dotman
 
 go 1.21.5
 

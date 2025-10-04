@@ -6,10 +6,12 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+
+	"github.com/connormullett/dotman/util"
 )
 
 func Remove(args []string) {
-	settings := ReadConfig()
+	settings := util.ReadConfig()
 
 	dotfileName := args[0]
 
@@ -76,6 +78,18 @@ func Remove(args []string) {
 		log.Fatalf("Error moving file back to original location: %v", err)
 	}
 
-	AddAndCommit(path, "Removed "+dotfileName)
+	util.AddAndCommit(path, "Removed "+dotfileName)
+
+	if settings.ManagedFiles != nil {
+		for i, file := range settings.ManagedFiles {
+			if filepath.Base(file) == dotfileName {
+				// Remove from ManagedFiles slice
+				settings.ManagedFiles = append(settings.ManagedFiles[:i], settings.ManagedFiles[i+1:]...)
+				break
+			}
+		}
+	}
+	util.WriteConfig(settings)
+
 	fmt.Printf("Successfully removed %s from dotman management\n", dotfileName)
 }

@@ -5,23 +5,25 @@ import (
 	"log"
 	"os"
 	"os/exec"
+
+	"github.com/connormullett/dotman/util"
 )
 
 func Push(args []string, force bool) {
-	settings := ReadConfig()
+	settings := util.ReadConfig()
 	repoPath := settings.Path
 
 	gitRepoPath := repoPath
 
-	isDirty := CheckIfGitDirty(gitRepoPath)
+	isDirty := util.IsRepoDirty(gitRepoPath)
 
 	var execCmd *exec.Cmd
 	var err error
 	if isDirty {
-		AddAndCommit(gitRepoPath, "auto-commit before push")
+		util.AddAndCommit(gitRepoPath, "auto-commit before push")
 	}
 
-	branch, err := GetCurrentBranch()
+	branch, err := util.GetCurrentBranch()
 	if err != nil {
 		log.Fatalf("Error getting current branch: %v", err)
 	}

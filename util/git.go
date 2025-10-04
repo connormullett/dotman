@@ -1,4 +1,4 @@
-package subcommands
+package util
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func GitPull(path string, quiet bool) {
+func Pull(path string, quiet bool) {
 	currentBranch, err := GetCurrentBranch()
 	if err != nil {
 		log.Fatalf("Error getting current branch: %v", err)
@@ -46,7 +46,7 @@ func AddAndCommit(path, message string) {
 	}
 }
 
-func CheckIfGitDirty(path string) bool {
+func IsRepoDirty(path string) bool {
 	cmd := "git"
 	args := []string{"diff", "--quiet"}
 
@@ -67,7 +67,7 @@ func GetCurrentBranch() (string, error) {
 	return branch, nil
 }
 
-func GitAdd(path, file string) {
+func Add(path, file string) {
 	commandName := "git"
 	cmdArgs := []string{"add", file}
 

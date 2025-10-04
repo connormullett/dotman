@@ -5,10 +5,12 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/connormullett/dotman/util"
 )
 
 func Add(args []string) {
-	settings := ReadConfig()
+	settings := util.ReadConfig()
 
 	dotfilePath := args[0]
 
@@ -73,9 +75,9 @@ func Add(args []string) {
 		log.Fatalf("Error creating symlink: %v", err)
 	}
 
-	// git add
-	GitAdd(repoPath, targetPath)
+	util.AddManagedFile(dotfilePath)
 
-	// create commit
-	CommitNewFile(repoPath, fileName)
+	util.Add(repoPath, targetPath)
+
+	util.CommitNewFile(repoPath, fileName)
 }
