@@ -12,9 +12,19 @@ func Add(args []string) {
 
 	dotfilePath := args[0]
 
-	_, err := os.Stat(dotfilePath)
+	// Use Lstat instead of Stat to detect symlinks without following them
+	fi, err := os.Lstat(dotfilePath)
 	if os.IsNotExist(err) {
 		fmt.Printf("Dotfile %s does not exist\n", dotfilePath)
+		return
+	}
+	if err != nil {
+		log.Fatalf("Error checking dotfile: %v", err)
+	}
+
+	// Check if it's already a symlink
+	if fi.Mode()&os.ModeSymlink != 0 {
+		fmt.Printf("Dotfile %s is already a symlink, skipping\n", dotfilePath)
 		return
 	}
 

@@ -7,17 +7,15 @@ import (
 )
 
 func List(args []string) {
-	entries := GetFilesList()
+	settings := ReadConfig()
+
+	entries := GetFilesList(settings.Path)
 	for _, entry := range entries {
 		fmt.Println(entry)
 	}
 }
 
-func GetFilesList() []string {
-	settings := ReadConfig()
-
-	path := settings.Path
-
+func GetFilesList(path string) []string {
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		log.Fatalf("Failed to read directory: %v", err)

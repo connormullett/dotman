@@ -69,6 +69,15 @@ var listSubCommand = &cobra.Command{
 	},
 }
 
+var doctorSubCommand = &cobra.Command{
+	Use:   "doctor",
+	Short: "Check the health of your dotman setup",
+	Long:  `Check the health of your dotman setup`,
+	Run: func(cmd *cobra.Command, args []string) {
+		subcommands.Doctor(args)
+	},
+}
+
 func Execute() {
 	rootCmd.AddCommand(
 		initSubCommand,
@@ -77,6 +86,7 @@ func Execute() {
 		removeSubCommand,
 		syncSubCommand,
 		listSubCommand,
+		doctorSubCommand,
 	)
 	pushSubCommand.Flags().BoolP("force", "f", false, "Force push changes to remote repository")
 	cobra.CheckErr(rootCmd.Execute())
