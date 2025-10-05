@@ -6,30 +6,61 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"slices"
 
 	"github.com/connormullett/dotman/util"
 )
+
+func CheckIfSymlinkExists(path string) bool {
+	info, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		return false
+	}
+	return info != ""
+}
 
 func Sync(args []string, quiet bool) {
 	settings := util.ReadConfig()
 	repoPath := settings.Path
 
+	currentUser, err := user.Current()
+	if err != nil {
+		log.Fatalf("Error getting current user: %v", err)
+	}
+	homeDir := currentUser.HomeDir
+
+	// abort if repo is dirty
 	if util.IsRepoDirty(repoPath) {
 		fmt.Println("Repository is dirty, This can cause conflicts in your history and merge conflicts which will need to be done manually")
 		log.Fatalf("Please commit or stash your changes before syncing.")
 	}
 
+	// pull changes
 	util.Pull(repoPath, quiet)
 
-	// check if symlinks exist and create them if they don't
-	dotfiles := GetFilesList(repoPath)
-
-	currentUser, err := user.Current()
+	// add unmanaged files (new to this client)
+	dir, err := os.ReadDir(repoPath)
 	if err != nil {
-		log.Fatalf("Error getting current user: %v", err)
+		log.Fatalf("Error reading repository directory: %v", err)
 	}
 
-	homeDir := currentUser.HomeDir
+	// check if file is already managed, add if not
+	for _, entry := range dir {
+		if entry.IsDir() {
+			continue
+		}
+
+		path := filepath.Join(homeDir, entry.Name())
+		if !slices.Contains(settings.ManagedFiles, path) {
+			settings.ManagedFiles = append(settings.ManagedFiles, path)
+		}
+	}
+
+	util.WriteConfig(settings)
+
+	// create symlinks
+	dotfiles := GetFilesList(repoPath)
+
 	for _, file := range dotfiles {
 		targetPath := filepath.Join(homeDir, filepath.Base(file))
 
@@ -62,20 +93,11 @@ func Sync(args []string, quiet bool) {
 		}
 
 		if !CheckIfSymlinkExists(targetPath) {
-			fmt.Println("source: ", file)
-			fmt.Println("target: ", targetPath)
-			err := os.Symlink(file, targetPath)
+			repoFilePath := filepath.Join(repoPath, filepath.Base(file))
+			err := os.Symlink(repoFilePath, targetPath)
 			if err != nil {
 				log.Printf("Error creating symlink for %s: %v", file, err)
 			}
 		}
 	}
-}
-
-func CheckIfSymlinkExists(path string) bool {
-	info, err := filepath.EvalSymlinks(path)
-	if err != nil {
-		return false
-	}
-	return info != ""
 }

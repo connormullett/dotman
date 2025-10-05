@@ -17,7 +17,7 @@ func Doctor(args []string, fix bool) {
 
 	path := settings.Path
 
-	managedFiles := GetFilesList(path)
+	managedFiles := GetManagedFilesList(path)
 
 	currentUser, err := user.Current()
 
